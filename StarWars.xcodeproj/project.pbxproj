@@ -19,6 +19,7 @@
 		46A2D93C233D5FBD00BB66DE /* JSONDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A2D93B233D5FBD00BB66DE /* JSONDownloader.swift */; };
 		46A2D93E233D606100BB66DE /* APIErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A2D93D233D606100BB66DE /* APIErrors.swift */; };
 		46A2D940233D60CC00BB66DE /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A2D93F233D60CC00BB66DE /* Endpoint.swift */; };
+		5CFB075C234158E5000D1EAA /* StarWarsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB075B234158E5000D1EAA /* StarWarsAPI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		46A2D93B233D5FBD00BB66DE /* JSONDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONDownloader.swift; sourceTree = "<group>"; };
 		46A2D93D233D606100BB66DE /* APIErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIErrors.swift; sourceTree = "<group>"; };
 		46A2D93F233D60CC00BB66DE /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		5CFB075B234158E5000D1EAA /* StarWarsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarWarsAPI.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				46A2D93B233D5FBD00BB66DE /* JSONDownloader.swift */,
 				46A2D93D233D606100BB66DE /* APIErrors.swift */,
 				46A2D93F233D60CC00BB66DE /* Endpoint.swift */,
+				5CFB075B234158E5000D1EAA /* StarWarsAPI.swift */,
 			);
 			path = StarWars;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 				46A2D93E233D606100BB66DE /* APIErrors.swift in Sources */,
 				46778BE4233A9C4500AD51C8 /* Vehicle.swift in Sources */,
 				46778BE6233A9C5D00AD51C8 /* Starship.swift in Sources */,
+				5CFB075C234158E5000D1EAA /* StarWarsAPI.swift in Sources */,
 				46778BE2233A903200AD51C8 /* Character.swift in Sources */,
 				46778BD2233A900A00AD51C8 /* ViewController.swift in Sources */,
 				46778BD0233A900A00AD51C8 /* AppDelegate.swift in Sources */,
