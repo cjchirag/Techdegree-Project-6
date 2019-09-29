@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+/*
 class APIClient {
     
     let downloader = JSONDownloader()
@@ -144,3 +144,4 @@ class APIClient {
         
     }
 }
+*/

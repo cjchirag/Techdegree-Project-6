@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum SWAPIError: Error {
+enum StarWarsError: Error {
     case requestFailed
     case responseUnsuccessful
     case invalidData

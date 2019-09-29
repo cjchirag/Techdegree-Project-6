@@ -20,6 +20,7 @@
 		46A2D93E233D606100BB66DE /* APIErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A2D93D233D606100BB66DE /* APIErrors.swift */; };
 		46A2D940233D60CC00BB66DE /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A2D93F233D60CC00BB66DE /* Endpoint.swift */; };
 		5CFB075C234158E5000D1EAA /* StarWarsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB075B234158E5000D1EAA /* StarWarsAPI.swift */; };
+		5CFB075E234172B1000D1EAA /* CollectionResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB075D234172B1000D1EAA /* CollectionResults.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		46A2D93D233D606100BB66DE /* APIErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIErrors.swift; sourceTree = "<group>"; };
 		46A2D93F233D60CC00BB66DE /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		5CFB075B234158E5000D1EAA /* StarWarsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarWarsAPI.swift; sourceTree = "<group>"; };
+		5CFB075D234172B1000D1EAA /* CollectionResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionResults.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 		46778BCE233A900A00AD51C8 /* StarWars */ = {
 			isa = PBXGroup;
 			children = (
+				5CFB075F234172C1000D1EAA /* Networking */,
 				46778BCF233A900A00AD51C8 /* AppDelegate.swift */,
 				46778BD1233A900A00AD51C8 /* ViewController.swift */,
 				46778BD3233A900A00AD51C8 /* Main.storyboard */,
@@ -81,11 +84,19 @@
 				46778BE5233A9C5D00AD51C8 /* Starship.swift */,
 				46A2D939233D55A700BB66DE /* APIClient.swift */,
 				46A2D93B233D5FBD00BB66DE /* JSONDownloader.swift */,
+			);
+			path = StarWars;
+			sourceTree = "<group>";
+		};
+		5CFB075F234172C1000D1EAA /* Networking */ = {
+			isa = PBXGroup;
+			children = (
 				46A2D93D233D606100BB66DE /* APIErrors.swift */,
 				46A2D93F233D60CC00BB66DE /* Endpoint.swift */,
 				5CFB075B234158E5000D1EAA /* StarWarsAPI.swift */,
+				5CFB075D234172B1000D1EAA /* CollectionResults.swift */,
 			);
-			path = StarWars;
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -168,6 +179,7 @@
 				46778BE2233A903200AD51C8 /* Character.swift in Sources */,
 				46778BD2233A900A00AD51C8 /* ViewController.swift in Sources */,
 				46778BD0233A900A00AD51C8 /* AppDelegate.swift in Sources */,
+				5CFB075E234172B1000D1EAA /* CollectionResults.swift in Sources */,
 				46A2D93A233D55A700BB66DE /* APIClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

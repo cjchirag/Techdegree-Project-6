@@ -9,6 +9,7 @@
 import Foundation
 class JSONDownloader {
     let session: URLSession // URLSession instance: An object that coordinates a group of related network data transfer tasks.
+    let decoder = JSONDecoder()
     
     //The URLSession class and related classes provide an API for downloading data from and uploading data to endpoints indicated by URLs.
     
@@ -39,7 +40,7 @@ class JSONDownloader {
     }
     
     typealias JSON = [String: AnyObject]
-    typealias JSONTaskCompletionHandler = (JSON?, SWAPIError?) -> Void
+    typealias JSONTaskCompletionHandler = (JSON?, StarWarsError?) -> Void
     
     //Once you have a session, you create a data task with one of the dataTask() methods. Tasks are created in a suspended state, and can be started by calling resume().
     
@@ -50,15 +51,16 @@ class JSONDownloader {
         let task = session.dataTask(with: request) { data, response, error in
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                completion(nil, .requestFailed)
+                completion(nil, .invalidData)
                 return
             }
             
             if httpResponse.statusCode == 200 {
                 if let data = data {
                     do {
-                        let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
-                        completion(json, nil)
+                        //let jsonResponse = try self.decoder.decode(T.self, from: data)
+                        //let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
+                        //completion(json, nil)
                     } catch {
                         completion(nil, .jsonConversionFailure)
                     }
