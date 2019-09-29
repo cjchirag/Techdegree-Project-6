@@ -9,15 +9,13 @@
 import Foundation
 class JSONDownloader {
     let session: URLSession // URLSession instance: An object that coordinates a group of related network data transfer tasks.
-    // Oh boy the first one...
     
     //The URLSession class and related classes provide an API for downloading data from and uploading data to endpoints indicated by URLs.
     
     
     
     
-    
-    // Sweet clarifier:
+   
     
     
     
