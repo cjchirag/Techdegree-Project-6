@@ -20,22 +20,6 @@ enum Category {
     case starships
 }
 
-struct Collection<T: Decodable>: Decodable {
-    var count: Int
-    var next: String?
-    var previous: String?
-    var results: [T]
-    
-    private enum CodingKeys: String, CodingKey {
-        case count
-        case next
-        case previous
-        case results
-    }
-}
-
-
-
 class StarWarsAPI<T: Resource> where T: Decodable {
     static var session: URLSession {
         return URLSession(configuration: .default)
@@ -50,15 +34,89 @@ class StarWarsAPI<T: Resource> where T: Decodable {
         
         return decoder
     }
+    // How to use groups
+    //Error handling over here
+    //Pages vs. Ts!! Think about this and refactor a bit.
     
-    func getData(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void){
+    static func getData(_ urls: [URL], completion: @escaping (Result<[T],StarWarsError>) -> Void) {
+        var datas: [T] = []
+        var group = DispatchGroup()
+        var count = 0
+        
+        for url in urls {
+            getT(request: URLRequest(url: url)) { result in
+                group.enter()
+                switch result{
+                case .success(let data):
+                    datas[count] = data
+                    count += 1
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
         
     }
     
+    static func getURLS(request: URLRequest, completion: @escaping (Result<[URL],StarWarsError>) -> Void) {
+        var URLList: [URL] = []
+        getCollection(request: request) { result in
+            switch result {
+            case .success(let data):
+                guard let urlstring = data.next else {
+                    return
+                }
+                var urlOptional = URL(string: urlstring)
+                guard let url = urlOptional else {
+                    return
+                }
+                URLList.append(url)
+                completion(.success(URLList))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
     
     
+    /*
+    static func getData(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
+        performRequestWith(request: request, completion: <#T##(Result<Data, StarWarsError>) -> Void#>)
+    }
+    */
+}
+/*
+ static func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void){
+ performRequestWith(request: request) { result in
+ switch result {
+ case .success(let data):
+ let jsonResponse = try self.decoder.decode(CollectionResults<T>.self, from: data)
+ completion(.success(jsonResponse))
+ case .failure(let error):
+ completion(.failure(error))
+ }
+ }
+ }
+ */
+
+extension StarWarsAPI {
     
-    static func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
+    static func getT(request: URLRequest, completion: @escaping (Result<T, StarWarsError>) -> Void) {
+        var resource: T?
+        performRequestWith(request: request) { result in
+            switch result{
+            case .success(let data):
+                guard let resource = data as? T else {
+                    return
+                }
+                completion(.success(resource))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+     static func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
         performRequestWith(request: request) { result in
             switch result{
             case .success(let data):
@@ -107,16 +165,3 @@ class StarWarsAPI<T: Resource> where T: Decodable {
         task.resume()
     }
 }
-/*
- static func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void){
- performRequestWith(request: request) { result in
- switch result {
- case .success(let data):
- let jsonResponse = try self.decoder.decode(CollectionResults<T>.self, from: data)
- completion(.success(jsonResponse))
- case .failure(let error):
- completion(.failure(error))
- }
- }
- }
- */

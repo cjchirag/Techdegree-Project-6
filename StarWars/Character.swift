@@ -9,7 +9,8 @@
 import Foundation
 
 
-class Person {
+class Person: Resource, Decodable {
+    
     var name: String
     var height: Int
     var mass: Int
@@ -76,5 +77,31 @@ extension Person {
             
         self.init(Name: name, Height: height, Mass: mass, Hair_Color: hair_color, Skin_Color: skin_color, Eye_Color: eye_color, Birth_Year: birth_year, Gender: gender, HomeWorld: homeworld, Films: films, Species: species, Vehicles: vehicles, Starships: starships)
     }
+    private enum CodingKeys: String, CodingKey {
+        case name
+        case height
+        case mass
+        case hair_color
+        case skin_color
+        case eye_color
+        case gender
+        case birth_year
+        case vehicles
+        case starships
+        case films
+        case species
+        case homeworld
+    }
 }
+
+extension Person {
+    var category: Category {
+        return .people
+    }
+    
+    var endpoint: StarWarsEndpoint {
+        return .people
+    }
+}
+
 

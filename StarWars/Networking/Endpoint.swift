@@ -32,11 +32,6 @@ extension Endpoint {
     }
 }
 
-enum DataType: String {
-    case Person = "people"
-    case Vehicle = "vehicles"
-    case Starship = "starships"
-}
 
 enum StarWarsEndpoint: String {
     case people

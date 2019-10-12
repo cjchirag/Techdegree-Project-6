@@ -12,8 +12,8 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var client = StarWarsAPI()
-        
+        var client = StarWarsAPI<Person>()
+       
         // Do any additional setup after loading the view.
     }
 
