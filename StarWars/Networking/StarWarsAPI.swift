@@ -35,16 +35,55 @@ class StarWarsAPI<T: Resource> where T: Decodable {
         return decoder
     }
     
+    func test(request: URLRequest) -> [T] {
+        var totalresult: [T] = []
+        var firstCollection: CollectionResults<T> = CollectionResults(count: 0, next: "", previous: "", results: [])
+        
+        DispatchQueue.global(qos: .background).async {
+        StarWarsAPI.getCollection(request: request) { result in
+            switch result {
+            case .success(let data):
+                firstCollection = data
+                print(data)
+            case.failure(let error):
+                print("Error in fetching first one")
+            }
+        }
+        
+        StarWarsAPI.getPages(first: firstCollection) { result in
+            switch result {
+            case .success(let data):
+                totalresult = data
+            case .failure(let error):
+                print("Error in fetching the entire collection!")
+            }
+        }
+        }
+        
+        return totalresult
+    }
+    
     // How to use groups
     //Error handling over here
     //Pages vs. Ts!! Think about this and refactor a bit.
-    
+    /*
     func getDatas(_ urlrequest: URLRequest) -> [T] {
         var datas: [T] = []
         var urls: [URL]?
+        var first: CollectionResults<T>?
         
         DispatchQueue.global(qos: .background).async {
-        StarWarsAPI.getURLS(request: urlrequest) { result in
+            
+            StarWarsAPI.getCollection(request: urlrequest) { result in
+                switch result {
+                case .success(let data):
+                    first = data
+                case .failure(let error):
+                    print("Error in fetching the first one")
+                }
+            }
+            
+        StarWarsAPI.getURLS(first: first) { result in
             switch result{
             case .success(let data):
                 var count = 0
@@ -59,6 +98,7 @@ class StarWarsAPI<T: Resource> where T: Decodable {
     }
         
         guard let yurls = urls else {
+            print(urls)
             return []
         }
         
@@ -111,26 +151,42 @@ class StarWarsAPI<T: Resource> where T: Decodable {
     }
         
     }
+    */
     
-    static func getURLS(request: URLRequest, completion: @escaping (Result<[URL],StarWarsError>) -> Void) {
+    static func getPages(first: CollectionResults<T>, completion: @escaping (Result<[T],StarWarsError>) -> Void) {
         var URLList: [URL] = []
+        var firstResponse = first
+        var totalResults = first.results
+        
+        let group = DispatchGroup()
         DispatchQueue.global(qos: .background).async {
+            
+            while let nextPage = firstResponse.next {
+            group.enter()
+                
+                guard let url = URL(string: nextPage) else {
+                    completion(.failure(StarWarsError.responseUnsuccessful))
+                    return
+                }
+                let request = URLRequest(url: url)
+                
         getCollection(request: request) { result in
             switch result {
             case .success(let data):
-                guard let urlstring = data.next else {
-                    return
-                }
-                let urlOptional = URL(string: urlstring)
-                guard let url = urlOptional else {
-                    return
-                }
-                URLList.append(url)
-                completion(.success(URLList))
+                var response = data.results
+                totalResults += response
+                group.leave()
             case .failure(let error):
+                group.leave()
                 completion(.failure(error))
             }
         }
+                group.wait()
+        }
+            group.notify(queue: .main) {
+                print("Fetching all pages, results: \(totalResults.count)")
+                completion(.success(totalResults))
+            }
     }
 }
     

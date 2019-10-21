@@ -15,8 +15,7 @@ class ViewController: UIViewController {
         var client = StarWarsAPI<Person>()
         var endpoint = StarWarsEndpoint.people
         print(endpoint.request)
-        print(client.getDatas(endpoint.request))
-        
+        client.test(request: endpoint.request)
         // Do any additional setup after loading the view.
     }
 
