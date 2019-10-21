@@ -12,8 +12,8 @@ import Foundation
 class Person: Resource, Decodable {
     
     var name: String
-    var height: Int
-    var mass: Int
+    var height: String
+    var mass: String
     var hair_color: String
     var skin_color: String
     var eye_color: String
@@ -27,8 +27,8 @@ class Person: Resource, Decodable {
     
     init(Name: String, Height: String, Mass: String, Hair_Color: String, Skin_Color: String, Eye_Color: String, Birth_Year: String, Gender: String, HomeWorld: String, Films: [String], Species: [String], Vehicles: [String], Starships: [String]) {
         self.name = Name
-        self.height = Int(Height) ?? 0
-        self.mass = Int(Mass) ?? 0
+        self.height = Height
+        self.mass = Mass
         self.hair_color = Hair_Color
         self.skin_color = Skin_Color
         self.eye_color = Eye_Color
