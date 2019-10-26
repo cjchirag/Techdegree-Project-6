@@ -12,10 +12,14 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var client = StarWarsAPI<Person>()
-        var endpoint = StarWarsEndpoint.people
-        print(endpoint.request)
-        client.test(request: endpoint.request)
+        
+        func getCharacter(completion: @escaping ([Person], StarWarsError?) -> Void) {
+            let client = StarWarsAPI<Person>()
+            client.getData(for: .people) { result in
+                
+            }
+        }
+        
         // Do any additional setup after loading the view.
     }
 
