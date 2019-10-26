@@ -58,12 +58,12 @@ class StarWarsAPI<T: Resource> where T: Decodable {
             return
         }
         
-        performRequestWith(request: theRequest) { result in
+        getCollection(request: theRequest) { result in
             switch result{
             case .success(let data):
                 do{
-                    let jsonResponse = try self.decoder.decode([T].self, from: data)
-                    completion(.success(jsonResponse))
+                
+                    let jsonResponse = try self.decoder.decode([T].self, from: data.results)
                 }  catch let DecodingError.dataCorrupted(context) {
                     print(context)
                 } catch let DecodingError.keyNotFound(key, context){
@@ -85,8 +85,6 @@ class StarWarsAPI<T: Resource> where T: Decodable {
 
 
 extension StarWarsAPI {
-    
-    
     
      private func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
         performRequestWith(request: request) { result in

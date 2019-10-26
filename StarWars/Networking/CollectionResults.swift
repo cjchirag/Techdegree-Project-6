@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct CollectionResults<T: Decodable>: Decodable {
+struct CollectionResults<T: Resource>: Decodable where T: Decodable, T: Data {
     let count: Int
     let next: String?
     let previous: String?
