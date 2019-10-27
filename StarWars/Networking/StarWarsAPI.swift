@@ -41,8 +41,9 @@ class StarWarsAPI<T: Resource> where T: Decodable {
         
         return decoder
     }
-    
+   
     func getAllData(for category: Category, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
+        var group = DispatchGroup()
         var request: URLRequest?
         var allDatas: [T] = []
         if category == .people {
@@ -59,44 +60,55 @@ class StarWarsAPI<T: Resource> where T: Decodable {
             completion(.failure(.requestFailed))
             return
         }
+        DispatchQueue.global(qos: .background).async {
+            
             self.getCollection(request: theRequest) { result in
-            switch result{
-            case .success(let data):
-               
-                var count = 0
-                var nextFlag = true
-                var resultArray = data.results
-                while count <= data.count && nextFlag == true {
-                    for value in resultArray {
-                        allDatas.append(value)
-                    }
-                    if data.next == nil {
-                        nextFlag = false
-                    } else {
-                        nextFlag = true
-                        if let nextString = data.next, let nextURL = URL(string: nextString) {
-                            let nextRequest = URLRequest(url: nextURL)
-                            self.getData(for: nextRequest) { result in
-                                switch result{
-                                case .success(let data):
-                                    resultArray = data
-                                case .failure(let error):
-                                    print("Error in getting the next object")
+                switch result{
+                case .success(let data):
+                    group.enter()
+                    var count = 0
+                    var nextFlag = true
+                    var resultArray = data.results //First set of collection
+                    
+                    
+                    while nextFlag == true { // loop will run until there is no next page
+                        for value in resultArray {
+                            allDatas.append(value) // Adding sets of collection to the alldata array
+                        }
+                        if data.next == nil {
+                            nextFlag = false
+                        } else {
+                            nextFlag = true
+                            if let nextString = data.next, let nextURL = URL(string: nextString) {
+                                let nextRequest = URLRequest(url: nextURL)
+                                self.getData(for: nextRequest) { result in
+                                    switch result{
+                                    case .success(let data):
+                                        resultArray = data
+                                        print("Working here for the: \(count)")
+                                        group.leave()
+                                    case .failure(let error):
+                                        group.leave()
+                                        print("Error in getting the next object")
+                                    }
                                 }
+                             group.wait()
                             }
                         }
+                        count = count + 1
                     }
-                    count = count + 1
+                    
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                    group.leave()
                 }
-                
-            case .failure(let error):
-                print(error)
-                completion(.failure(error))
             }
-            }
-    
+        }
+        group.notify(queue: .main){
         completion(.success(allDatas))
-       
+        }
+        
     }
     
     func getData(for request: URLRequest, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
@@ -178,183 +190,3 @@ extension StarWarsAPI {
         task.resume()
     }
 }
-
-/*
- func test(request: URLRequest) -> [T] {
- var totalresult: [T] = []
- var firstCollection: CollectionResults<T> = CollectionResults(count: 0, next: "", previous: "", results: [])
- 
- DispatchQueue.global(qos: .background).async {
- self.getCollection(request: request) { result in
- switch result {
- case .success(let data):
- firstCollection = data
- print(data)
- case.failure(let error):
- print("Error in fetching first one")
- }
- }
- 
- StarWarsAPI.getPages(first: firstCollection) { result in
- switch result {
- case .success(let data):
- totalresult = data
- case .failure(let error):
- print("Error in fetching the entire collection!")
- }
- }
- }
- 
- return totalresult
- }
- */
-
-/*
- static func getPages(first: CollectionResults<T>, completion: @escaping (Result<[T],StarWarsError>) -> Void) {
- var URLList: [URL] = []
- var firstResponse = first
- var totalResults = first.results
- 
- let group = DispatchGroup()
- DispatchQueue.global(qos: .background).async {
- 
- while let nextPage = firstResponse.next {
- group.enter()
- 
- guard let url = URL(string: nextPage) else {
- completion(.failure(StarWarsError.responseUnsuccessful))
- return
- }
- let request = URLRequest(url: url)
- 
- getCollection(request: request) { result in
- switch result {
- case .success(let data):
- var response = data.results
- totalResults += response
- group.leave()
- case .failure(let error):
- group.leave()
- completion(.failure(error))
- }
- }
- group.wait()
- }
- group.notify(queue: .main) {
- print("Fetching all pages, results: \(totalResults.count)")
- completion(.success(totalResults))
- }
- }
- }
- */
-
-/*
- static func getData(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
- performRequestWith(request: request, completion: <#T##(Result<Data, StarWarsError>) -> Void#>)
- }
- */
-
-
-/*
- static func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void){
- performRequestWith(request: request) { result in
- switch result {
- case .success(let data):
- let jsonResponse = try self.decoder.decode(CollectionResults<T>.self, from: data)
- completion(.success(jsonResponse))
- case .failure(let error):
- completion(.failure(error))
- }
- }
- }
- */
-
-// How to use groups
-//Error handling over here
-//Pages vs. Ts!! Think about this and refactor a bit.
-/*
- func getDatas(_ urlrequest: URLRequest) -> [T] {
- var datas: [T] = []
- var urls: [URL]?
- var first: CollectionResults<T>?
- 
- DispatchQueue.global(qos: .background).async {
- 
- StarWarsAPI.getCollection(request: urlrequest) { result in
- switch result {
- case .success(let data):
- first = data
- case .failure(let error):
- print("Error in fetching the first one")
- }
- }
- 
- StarWarsAPI.getURLS(first: first) { result in
- switch result{
- case .success(let data):
- var count = 0
- for url in data{
- urls?[count] = url
- count = count + 1
- }
- case .failure(let error):
- print("Error in collecting urls")
- }
- }
- }
- 
- guard let yurls = urls else {
- print(urls)
- return []
- }
- 
- DispatchQueue.global(qos: .background).async {
- StarWarsAPI.getData(yurls) { result in
- switch result{
- case .success(let data):
- var count = 0
- for d in data{
- datas[count] = d
- count = count + 1
- print(d)
- }
- case .failure(let error):
- print("An error has occured")
- }
- }
- }
- return datas
- 
- }
- 
- 
- 
- static func getData(_ urls: [URL], completion: @escaping (Result<[T],StarWarsError>) -> Void) {
- var datas: [T] = []
- let group = DispatchGroup()
- var count = 0
- 
- 
- DispatchQueue.global(qos: .background).async {
- for url in urls {
- group.enter()
- getTS(request: URLRequest(url: url)) { result in
- 
- switch result{
- case .success(let data):
- for resource in data {
- datas[count] = resource
- count += 1
- }
- completion(.success(datas))
- group.leave()
- case .failure(let error):
- group.leave()
- completion(.failure(error))
- }
- }
- }
- }
- 
- }
- */

@@ -9,15 +9,19 @@
 import UIKit
 
 class ViewController: UIViewController {
+    @IBOutlet weak var data: UIButton!
+    @IBAction func databutton(_ sender: Any) {
+       
+
+    }
     var resultArray: [Person] = []
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         let client = StarWarsAPI<Person>()
         client.getAllData(for: .people) { resultant in
             switch resultant {
             case .success(let data):
-                data.map() {$0.name}
+                print("this")
             case .failure(let error):
                 print("Error in controller")
                 print(error)
