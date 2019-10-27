@@ -23,6 +23,7 @@ enum Category {
 class StarWarsAPI<T: Resource> where T: Decodable {
     let session: URLSession
     
+    
     init(configuration: URLSessionConfiguration) {
         self.session = URLSession(configuration: configuration)
     }
@@ -41,8 +42,9 @@ class StarWarsAPI<T: Resource> where T: Decodable {
         return decoder
     }
     
-    func getData(for category: Category, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
+    func getAllData(for category: Category, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
         var request: URLRequest?
+        var allDatas: [T] = []
         if category == .people {
             let endpoint = StarWarsEndpoint.people
             request = endpoint.request
@@ -57,13 +59,54 @@ class StarWarsAPI<T: Resource> where T: Decodable {
             completion(.failure(.requestFailed))
             return
         }
+            self.getCollection(request: theRequest) { result in
+            switch result{
+            case .success(let data):
+               
+                var count = 0
+                var nextFlag = true
+                var resultArray = data.results
+                while count <= data.count && nextFlag == true {
+                    for value in resultArray {
+                        allDatas.append(value)
+                    }
+                    if data.next == nil {
+                        nextFlag = false
+                    } else {
+                        nextFlag = true
+                        if let nextString = data.next, let nextURL = URL(string: nextString) {
+                            let nextRequest = URLRequest(url: nextURL)
+                            self.getData(for: nextRequest) { result in
+                                switch result{
+                                case .success(let data):
+                                    resultArray = data
+                                case .failure(let error):
+                                    print("Error in getting the next object")
+                                }
+                            }
+                        }
+                    }
+                    count = count + 1
+                }
+                
+            case .failure(let error):
+                print(error)
+                completion(.failure(error))
+            }
+            }
+    
+        completion(.success(allDatas))
+       
+    }
+    
+    func getData(for request: URLRequest, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
         
-        getCollection(request: theRequest) { result in
+        getCollection(request: request) { result in
             switch result{
             case .success(let data):
                 do{
-                
-                    let jsonResponse = try self.decoder.decode([T].self, from: data.results)
+                    let resultData = data.results
+                    completion(.success(resultData))
                 }  catch let DecodingError.dataCorrupted(context) {
                     print(context)
                 } catch let DecodingError.keyNotFound(key, context){
