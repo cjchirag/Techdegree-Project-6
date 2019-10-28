@@ -14,18 +14,12 @@ class ViewController: UIViewController {
        
 
     }
-    var resultArray: [Person] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let client = StarWarsAPI<Person>()
-        client.getAllData(for: .people) { resultant in
-            switch resultant {
-            case .success(let data):
-                print("this")
-            case .failure(let error):
-                print("Error in controller")
-                print(error)
-            }
+        client.getAllData(for: .people) {result in
+            print(result)
         }
         
         // Do any additional setup after loading the view.

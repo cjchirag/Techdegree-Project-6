@@ -60,54 +60,53 @@ class StarWarsAPI<T: Resource> where T: Decodable {
             completion(.failure(.requestFailed))
             return
         }
-        DispatchQueue.global(qos: .background).async {
-            
+        
             self.getCollection(request: theRequest) { result in
                 switch result{
                 case .success(let data):
-                    group.enter()
+                    
                     var count = 0
                     var nextFlag = true
-                    var resultArray = data.results //First set of collection
-                    
+                    var currentData = data
+                    var currentArray = currentData.results //First set of collection
+                    allDatas += currentArray
                     
                     while nextFlag == true { // loop will run until there is no next page
-                        for value in resultArray {
-                            allDatas.append(value) // Adding sets of collection to the alldata array
-                        }
-                        if data.next == nil {
+                        
+                        if currentData.next == nil {
                             nextFlag = false
                         } else {
                             nextFlag = true
                             if let nextString = data.next, let nextURL = URL(string: nextString) {
                                 let nextRequest = URLRequest(url: nextURL)
-                                self.getData(for: nextRequest) { result in
+                                self.getCollection(request: nextRequest) { result in
                                     switch result{
                                     case .success(let data):
-                                        resultArray = data
+                                        currentData = data
+                                        currentArray = currentData.results
+                                        allDatas += currentArray
                                         print("Working here for the: \(count)")
-                                        group.leave()
+                                        
                                     case .failure(let error):
-                                        group.leave()
+                                        
                                         print("Error in getting the next object")
                                     }
                                 }
-                             group.wait()
+                             
                             }
                         }
                         count = count + 1
                     }
-                    
+                    print("Calculations done for: \(count)")
+                    completion(.success(allDatas))
                 case .failure(let error):
                     print(error)
                     completion(.failure(error))
-                    group.leave()
+                    
                 }
             }
-        }
-        group.notify(queue: .main){
-        completion(.success(allDatas))
-        }
+        
+        
         
     }
     
