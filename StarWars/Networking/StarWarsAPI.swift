@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol Resource {
+protocol Resource: Decodable {
     var name: String {get}
     var category: Category {get}
     var endpoint: StarWarsEndpoint {get}
@@ -20,12 +20,12 @@ enum Category {
     case starships
 }
 
-class StarWarsAPI<T: Resource> where T: Decodable {
+class StarWarsAPI<T: Resource> {
     let session: URLSession
-    
     
     init(configuration: URLSessionConfiguration) {
         self.session = URLSession(configuration: configuration)
+       
     }
     
     convenience init() {
@@ -117,6 +117,7 @@ class StarWarsAPI<T: Resource> where T: Decodable {
             case .success(let data):
                 do{
                     let resultData = data.results
+                    data.results.map() {print("Getting data for: \($0.name)")}
                     completion(.success(resultData))
                 }  catch let DecodingError.dataCorrupted(context) {
                     print(context)

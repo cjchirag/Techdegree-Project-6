@@ -10,6 +10,8 @@ import Foundation
 
 
 class Person: Resource, Decodable {
+   
+    
     
     var name: String
     var height: String
