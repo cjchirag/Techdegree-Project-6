@@ -19,7 +19,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         let client = StarWarsAPI<Person>()
         client.getAllData(for: .people) {result in
-            print(result)
+            switch result{
+            case .success(let data):
+                print(data)
+            case .failure(let error):
+                print(error)
+            }
         }
         
         // Do any additional setup after loading the view.
