@@ -60,55 +60,57 @@ class StarWarsAPI<T: Resource> where T: Decodable {
             completion(.failure(.requestFailed))
             return
         }
-        
+            // To get the first Collection object
             self.getCollection(request: theRequest) { result in
                 switch result{
                 case .success(let data):
                     
-                    var count = 0
-                    var nextFlag = true
-                    var currentData = data
-                    var currentArray = currentData.results //First set of collection
-                    allDatas += currentArray
-                    
-                    while nextFlag == true { // loop will run until there is no next page
+                    var count = 0 // Starting point to count the number of T objects
+                    var nextFlag = true //To check if there is a next string
+                    var currentData = data //currentData stores the current Collection extracted
+                    var currentArray = currentData.results // currentArray stores the current sets of T objects extracts from currentData
+                    // This map function updates the first set of T datas received
+                    currentArray.map() {
+                        allDatas.append($0)
+                        count = count + 1
+                    }
+                    // This while function continues until all the T objects are stored in the allDatas object
+                    while count <= currentData.count { // loop will run until there is no next count
                         
+                            nextFlag = true // To check if there is a next string
                         if currentData.next == nil {
-                            nextFlag = false
+                            //Write logic when you reach the last one. 
+                            completion(.success(allDatas))
                         } else {
-                            nextFlag = true
                             if let nextString = data.next, let nextURL = URL(string: nextString) {
                                 let nextRequest = URLRequest(url: nextURL)
                                 self.getCollection(request: nextRequest) { result in
                                     switch result{
                                     case .success(let data):
-                                        currentData = data
-                                        currentArray = currentData.results
-                                        allDatas += currentArray
-                                        print("Working here for the: \(count)")
-                                        
+                                        currentData = data //The currentData is updated based on the new url
+                                        currentArray = currentData.results //Results extracted from the new array
+                                        currentArray.map() {
+                                            allDatas.append($0)
+                                            print("Working here for the: \(count)")
+                                            count = count + 1
+                                        }
                                     case .failure(let error):
+                                        print("Error in getting the next object: \(error)")
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
                                         
-                                        print("Error in getting the next object")
+                    case .failure(let error):
+                            print("Error in getting the next object")
                                     }
                                 }
                              
                             }
-                        }
-                        count = count + 1
-                    }
-                    print("Calculations done for: \(count)")
-                    completion(.success(allDatas))
-                case .failure(let error):
-                    print(error)
-                    completion(.failure(error))
-                    
-                }
-            }
-        
-        
-        
-    }
+    
+
     
     func getData(for request: URLRequest, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
         
