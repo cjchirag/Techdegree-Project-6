@@ -21,18 +21,11 @@ enum Category {
 }
 
 class StarWarsAPI<T: Resource> {
-    let session: URLSession
-    
-    init(configuration: URLSessionConfiguration) {
-        self.session = URLSession(configuration: configuration)
-       
+    private static var session: URLSession {
+        return URLSession(configuration: .default)
     }
     
-    convenience init() {
-        self.init(configuration: .default)
-    }
-    
-    var decoder: JSONDecoder{
+    private static var decoder: JSONDecoder {
         let decoder = JSONDecoder()
         let formatter = DateFormatter()
         
@@ -43,7 +36,6 @@ class StarWarsAPI<T: Resource> {
     }
    
     func getAllData(for category: Category, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
-        var group = DispatchGroup()
         var request: URLRequest?
         var allDatas: [T] = []
         if category == .people {
@@ -60,8 +52,9 @@ class StarWarsAPI<T: Resource> {
             completion(.failure(.requestFailed))
             return
         }
+        DispatchQueue.global(qos: .background).async {
             // To get the first Collection object
-            self.getCollection(request: theRequest) { result in
+            StarWarsAPI.getCollection(request: theRequest) { result in
                 switch result{
                 case .success(let data):
                     
@@ -77,14 +70,20 @@ class StarWarsAPI<T: Resource> {
                     // This while function continues until all the T objects are stored in the allDatas object
                     while count <= currentData.count { // loop will run until there is no next count
                         
-                            nextFlag = true // To check if there is a next string
+                        nextFlag = true // To check if there is a next string
                         if currentData.next == nil {
-                            //Write logic when you reach the last one. 
+                            //These statements are executed when we reach the final T collection.
+                            currentArray = currentData.results
+                            currentArray.map() {
+                                allDatas.append($0)
+                                print("We are at the last one!Yaay :D")
+                                count = count + 1
+                            }
                             completion(.success(allDatas))
                         } else {
                             if let nextString = data.next, let nextURL = URL(string: nextString) {
                                 let nextRequest = URLRequest(url: nextURL)
-                                self.getCollection(request: nextRequest) { result in
+                                StarWarsAPI.getCollection(request: nextRequest) { result in
                                     switch result{
                                     case .success(let data):
                                         currentData = data //The currentData is updated based on the new url
@@ -102,19 +101,19 @@ class StarWarsAPI<T: Resource> {
                         }
                         
                     }
-                                        
-                    case .failure(let error):
-                            print("Error in getting the next object")
-                                    }
-                                }
-                             
-                            }
+                    
+                case .failure(let error):
+                    print("Error in getting the next object")
+                }
+            }
+        }
+    }
     
 
     
     func getData(for request: URLRequest, completion: @escaping (Result<[T], StarWarsError>) -> Void) {
         
-        getCollection(request: request) { result in
+        StarWarsAPI<T>.getCollection(request: request) { result in
             switch result{
             case .success(let data):
                 do{
@@ -143,7 +142,7 @@ class StarWarsAPI<T: Resource> {
 
 extension StarWarsAPI {
     
-     private func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
+     private static func getCollection(request: URLRequest, completion: @escaping (Result<CollectionResults<T>, StarWarsError>) -> Void) {
         performRequestWith(request: request) { result in
             switch result{
             case .success(let data):
@@ -168,7 +167,7 @@ extension StarWarsAPI {
     }
     
     
-     private func performRequestWith(request: URLRequest, completion: @escaping (Result<Data, StarWarsError>) -> Void) {
+     private static func performRequestWith(request: URLRequest, completion: @escaping (Result<Data, StarWarsError>) -> Void) {
         
         
         let task = session.dataTask(with: request) { (data, response, error) in
