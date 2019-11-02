@@ -14,13 +14,23 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let client = StarWarsAPI<Person>()
-        client.getAllData(for: .people) { result in
+        var URLS: [String] = []
+        var firstCollection: CollectionResults<Person>?
+        client.getCollection(request: StarWarsEndpoint.people.request) { result in
             switch result {
             case .success(let data):
-                print("Fetching data")
-                data.map() {print($0.name)}
+                client.getURLS(with: data) { result in
+                    switch result{
+                    case .success(let datas):
+                        URLS = datas
+                        print(URLS.count)
+                        print(URLS)
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
             case .failure(let error):
-                print("There's an error: \(error)")
+                print(error)
             }
         }
         
